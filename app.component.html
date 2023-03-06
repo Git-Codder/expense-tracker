@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 mt-4">
+
+        <div *ngIf="flag">
+
+          <h1 *ngIf="flag" class="text-center">Admin DashBoard</h1>
+          <table *ngIf="flag" class="table table-bordered table-striped table-hover">
+            <thead>
+              <tr>
+                <th class="text-center">ID</th>
+                <th class="text-center">profile pic</th>
+                <th class="text-center">Email</th>
+                <th class="text-center">Password</th>
+                <th class="text-center">Date of Birth</th>
+                <th class="text-center">Mobile Number</th>
+                <th class="text-center">&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of users;let ind=index">
+                <td>{{ ind+1 }}</td>
+                <td><img [src]="user.sixthName" width="100px" height="100px"></td>
+                <td>{{ user.firstName }}</td>
+                <td>{{ user.lastName }}</td>
+                <td>{{ user.fourthName }}</td>
+                <td>{{ user.fifthName }}</td>
+                <td>
+                  <button type="button" class="btn btn-info btn-sm mr-2" (click)="showEditUserForm(user)">Edit</button>
+
+                  <button type="button" class="btn btn-danger btn-sm" (click)="removeUser(user)">Delete</button>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+
+          <!-- added new code here -->
+          <br>
+          <br>
+          <br>
+
+          <!-- selctBox to select two user -->
+          <div>
+            <div>
+              <h1 style="text-align: center; margin-bottom: 3rem;">Compare Incomes vs Expenses</h1>
+              <div style="display: flex; flex-direction: row; justify-content: space-around; margin-bottom: 2rem;">
+
+                <div>
+                  <label for="user1">Select User 1: </label>
+                  <select id="user1" [(ngModel)]="selectedUser1">
+                    <option *ngFor="let user of users">{{ user.firstName }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="user2">Select User 2: </label>
+                  <select id="user2" [(ngModel)]="selectedUser2">
+                    <option *ngFor="let user of users">{{ user.firstName }}</option>
+                  </select>
+                </div>
+
+              </div>
+              <div style="display: flex; flex-direction: row; justify-content: space-around;">
+                <button (click)="compare('ok')">All-Compare</button>
+
+                <button type="button" style="width:120px;" (click)="compare('day')">Day-Compare</button>
+
+                <button type="button" style="width:120px;" (click)="compare('week')">Week-Compare</button>
+
+                <button type="button" style="width:120px;" (click)="compare('month')">Month-Compare</button>
+              </div>
+            </div>
+            <div>
+              &nbsp;
+            </div>
+
+            <div *ngIf="chartData">
+              <h2 style="text-align: center; margin-bottom: 3rem;">Comparison Chart</h2>
+              <div id="chart-month"></div>
+            </div>
+
+            <!-- last month balance carry forward -->
+
+            <h1 style="text-align: center; margin-bottom: 3rem;">Compare Incomes vs Expenses</h1>
+            <div style="display: flex; flex-direction: row; justify-content: space-around; margin-bottom: 2rem;">
+
+              <div>
+                <label for="user_select">Select User 1: </label>
+                <select id="user_select" [(ngModel)]="userSelected_">
+                  <option *ngFor="let user of users">{{ user.firstName }}</option>
+                </select>
+              </div>
+              <div>
+                <label for="date_select">Select User 2: </label>
+                <select id="date_select" [(ngModel)]="dateSelected_">
+                  <option *ngFor="let month of time_arr">{{ month }}</option>
+                </select>
+              </div>
+
+              <div>
+                <button (click)="updateDisplay()">Calculate</button>
+              </div>
+            </div>
+
+            <div style="margin: 2rem; display: flex; justify-content: center;">
+              <table>
+                <tr>
+                  <td style="text-align: left;">Current month income:</td>
+                  <td style="text-align: right;">₹<span id="currentMonthIncome"></span></td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;">Current month expense:</td>
+                  <td style="text-align: right;">₹<span id="currentMonthExpense"></span></td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;">Total balance of previous months:</td>
+                  <td style="text-align: right;">₹<span id="prevBalance"></span></td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;">Total balance:</td>
+                  <td style="text-align: right;">₹<span id="totalBalance"></span></td>
+                </tr>
+                <tr>
+                  <td style="text-align: left;">Total income:</td>
+                  <td style="text-align: right;">₹<span id="totalIncome"></span></td>
+                </tr>
+              </table>
+            </div>
+
+
+          </div>
+
+          <br>
+          <br>
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px;">Feedback List</h2>
+            <div
+              style="display: flex; flex-direction: column; align-items: center; width: 80%; border: 1px solid #ccc; padding: 8px;">
+              <div *ngFor="let feedback of allFeedbacks"
+                style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 8px;">
+                <span style="font-size: 13px; font-weight: bold; margin-right: 8px;">{{ feedback.user }}:</span>
+                <span>{{ feedback.feedback}}</span>
+              </div>
+            </div>
+          </div>
+
+
+          <br>
+          <br>
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 16px;">Issue List</h2>
+            <div
+              style="display: flex; flex-direction: column; align-items: center; width: 80%; border: 1px solid #ccc; padding: 8px;">
+              <div *ngFor="let issue of allIssue"
+                style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 8px;">
+                <span style="font-size: 13px; font-weight: bold; margin-right: 8px;">{{ issue.user }}:</span>
+                <span>{{ issue.issueRaised}}</span>
+              </div>
+            </div>
+          </div>
+
+          <br />
+          <button type="button" class="btn btn-danger btn-sm" (click)="loggingout()">LogOut</button>
+        </div>
+
+        <h2 *ngIf="userPage"> Welcome {{currentUser}}</h2>
+        <button *ngIf="userPage" type="button" class="btn btn-danger btn-sm" (click)="userloggingout()">LogOut</button>
+        <!-- <h3 *ngIf="signupFlag">Signed in succuessfully</h3> -->
+        <div class="header">
+          <button *ngIf="logFlag" class="btn btn-success" (click)="showAddUserForm()">Sign Up</button>
+          &nbsp;
+          <button *ngIf="loginflag" class="btn btn-success" (click)="showloginForm()">Log IN</button>
+        </div>
+        <div>
+          <form class="user1" *ngIf="userForm">
+
+            <h2>Enter Email and Password</h2>
+            <p class="tl">Email: <input type="email" class="tr" name="firstName" [(ngModel)]="newUser.firstName" /></p>
+            <p class="tl">Password: <input type="password" class="tr" name="lastName" [(ngModel)]="newUser.lastName" />
+            </p>
+            <p class="tl">Confirm Password: <input type="password" class="tr" name="thirdName"
+                [(ngModel)]="newUser.thirdName" /></p>
+            <input type="hidden" name="fourthName" [(ngModel)]="newUser.fourthName" />
+            <input type="hidden" name="fifthName" [(ngModel)]="newUser.fifthName" />
+
+            <p>
+              <button type="button" class="btn btn-primary mr-2" (click)="saveUser(newUser)">Sign In</button>
+              <button type="button" class="btn btn-warning" (click)="cancelNewUser()">Cancel</button>
+            </p>
+          </form>
+          <form class="user1" *ngIf="loginForm">
+            <h2>Enter Email and Password</h2>
+            <p class="tl">Email: <input class="tr" type="email" name="firstName" [(ngModel)]="newUser.firstName" /></p>
+            <p class="tl">Password: <input class="tr" type="password" name="lastName" [(ngModel)]="newUser.lastName" />
+            </p>
+            <input type="hidden" name="fourthName" [(ngModel)]="newUser.fourthName" />
+            <input type="hidden" name="fifthName" [(ngModel)]="newUser.fifthName" />
+            <p>
+              <button type="button" class="btn btn-primary mr-2" (click)="validate(newUser)">Log IN</button>
+              <button type="button" class="btn btn-warning" (click)="cancelNewUser()">Cancel</button>
+            </p>
+          </form>
+
+          <form *ngIf="editUserForm">
+            <h2>Edit User Details</h2>
+            <input type='file' id="bannerImg1" (change)="sample1()">
+            <img [src]="editedUser.sixthName" id="imgPreview1" alt="Preview" width="100px" height="100px">
+            <p>Email: <input type="email" name="firstName" [(ngModel)]="editedUser.firstName" /></p>
+            <p>Password: <input type="text" name="lastName" [(ngModel)]="editedUser.lastName" /></p>
+            <p>Date of Birth: <input type="date" name="fourthName" [(ngModel)]="editedUser.fourthName" /></p>
+            <p>Mobile Number: <input type="number" name="fifthName" [(ngModel)]="editedUser.fifthName" /></p>
+            <p>
+              <button type="button" class="btn btn-primary mr-2" (click)="updateUser()">Submit</button>
+              <button type="button" class="btn btn-warning" (click)="cancelEdits()">Cancel</button>
+            </p>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="userpresentFlag">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 mt-4">
+
+          <div style="color: blueviolet;">
+            <h2>Welcome, {{curruser.firstName}}</h2>
+          </div>
+
+          <div style=" display: flex; justify-content: space-between;">
+            <button type="button" class="layer" (click)="profile()">Profile</button>
+            <button type="button" class="layer" (click)="income()">Income</button>
+            <button type="button" class="layer" (click)="expense()">Expense</button>
+            <button type="button" class="layer" (click)="summary()">Summary</button>
+            <button type="history" class="layer" (click)="history()">History</button>
+          </div>
+
+          <div>
+            Progress bar:
+          </div>
+
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"
+              [style.width]="probar+'%'">
+              {{probar}}%
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary mr-2" (click)="editbutton()">Edit Profile</button>
+          <form *ngIf="addFlag">
+            <h3>Edit Changes</h3>
+            <input type='file' id="bannerImg" (click)="sample()">
+            <img [src]="curruser.sixthName" id="imgPreview" alt="Preview" width="100px" height="100px">
+
+
+            <p>Date of birth :<input type="date" name="fourthName" [(ngModel)]="curruser.fourthName" /></p>
+            <p>Mobile Number :<input type="number" name="fifthName" [(ngModel)]="curruser.fifthName" /></p>
+
+            <p>
+              <button type="button" class="btn btn-primary mr-2" (click)=" additionalsave()">Save</button>
+
+            </p>
+          </form>
+          <p>Profile pic:&nbsp;</p>
+          <img [src]="curruser.sixthName" id="imgPreview" alt="Preview" width="100px" height="100px">
+          <p>Date of birth :{{curruser.fourthName}}</p>
+          <p>Mobile Number :{{curruser.fifthName}}</p>
+          <button type="button" class="btn btn-danger btn-sm" (click)="loggingout()">LogOut</button>
+        </div>
+
+      </div>
+
+      <!-- HTML code -->
+      <div style="text-align: center; margin-top: 3rem; display: flex; flex-direction: row;">
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 40%;">
+          <input type="text" placeholder="Enter your feedback"
+            style="border: .1rem solid #ccc; padding: 8px; width: 100%;border-radius: 2rem;" [(ngModel)]="feedbackText">
+          <button type="button"
+            style="padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;"
+            (click)="submitFeedback()">Submit</button>
+        </div>
+        <div
+          style="display: flex;flex-direction: column; align-items: center; gap: 10px; width: 40%; margin-left: 20%;">
+          <input type="text" placeholder="Enter your issue"
+            style="padding: 8px; border: 0.1rem solid #ccc;border-radius: 2rem; width: 100%;" [(ngModel)]="issueText">
+          <button type="button"
+            style="padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;"
+            (click)="submitIssue()">Submit Issue</button>
+        </div>
+
+      </div>
+
+
+
+
+
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 mt-4">
+        <div *ngIf="incomeFlag">
+          <div style="color: blueviolet;">
+            <h2>Welcome, {{curruser.firstName}}</h2>
+          </div>
+
+          <div style=" display: flex; justify-content: space-between;">
+            <button type="button" class="layer" (click)="profile()">Profile</button>
+            <button type="button" class="layer" (click)="income()">Income</button>
+            <button type="button" class="layer" (click)="expense()">Expense</button>
+            <button type="button" class="layer" (click)="summary()">Summary</button>
+            <button type="history" class="layer" (click)="history()">History</button>
+          </div>
+
+          <div style="margin-top: 2rem;">
+            <form>
+              <p>
+                Choose Income Options:<select name="city" class="" (change)="onChangeIncome($event.target.value)">
+                  <option *ngFor="let tab of incomeTab" [value]="tab">
+                    {{tab}}
+                  </option>
+                </select>
+              </p>
+              <p *ngIf="icustomFlag">Enter Other Income:<input *ngIf="icustomFlag" type="text" name="customcategory"
+                  [(ngModel)]="myuser.icustom" /></p>
+              <p>Enter {{selectedIncome}} Amount in {{icurrency}} :<input type="number" name="h"
+                  [(ngModel)]="myuser[selectedIncome]" />&nbsp;
+                <button style="border-radius: 1.3rem;" type="button" name="usd"
+                  (click)="incomeusdConverter()">conversion</button>
+              </p>
+              <p>Description :<input type="text" name="descr" [(ngModel)]="myuser.eightName" /></p>
+              <p>Date of Transaction: <input type="date" name="dot" [(ngModel)]="myuser.income_dot" /></p>
+            </form>
+          </div>
+
+          <h2>Income Details:</h2>
+          <div>
+            <h4>Salary:{{myuser.Salary}}</h4>
+            <h4>Bonus:{{myuser.Bonus}}</h4>
+            <h4>Cash:{{myuser.Cash}}</h4>
+            <h4>Check:{{myuser.Check}}</h4>
+            <h4>Others:{{myuser.Others}}</h4>
+
+          </div>
+
+          <div style="margin-top: 2rem;">
+            <button style="margin-right: 1.1rem;" type="button" class="btn btn-primary mr-2" (click)="incomesubmit()">Submit</button>
+            <button style="margin-left: 1.1rem;" type="button" class="btn btn-danger btn-sm" (click)="loggingout()">LogOut</button>
+          </div>
+        </div>
+        <div *ngIf="expenseFlag">
+          <div style="color: blueviolet;">
+            <h2>Welcome, {{curruser.firstName}}</h2>
+          </div>
+
+          <div style=" display: flex; justify-content: space-between;">
+            <button type="button" class="layer" (click)="profile()">Profile</button>
+            <button type="button" class="layer" (click)="income()">Income</button>
+            <button type="button" class="layer" (click)="expense()">Expense</button>
+            <button type="button" class="layer" (click)="summary()">Summary</button>
+            <button type="history" class="layer" (click)="history()">History</button>
+          </div>
+
+          <div style="margin-top: 2rem;">
+            <form>
+              <p>
+                Choose Expense Options:<select name="city" class="" (change)="onChangeExpense($event.target.value)">
+                  <option *ngFor="let tab of expenseTab" [value]="tab">
+                    {{tab}}
+                  </option>
+                </select>
+              </p>
+              <p *ngIf="ecustomFlag">Enter Other Expense:<input *ngIf="ecustomFlag" type="text" name="customcategory"
+                  [(ngModel)]="my2user.ecustom" /></p>
+
+              <p>Enter {{selectedExpense}} Amount in {{currency}} :<input type="number" name="h"
+                  [(ngModel)]="my2user[selectedExpense]" />&nbsp;
+                <button type="button" name="usd" (click)="usdConverter()">conversion</button>
+              </p>
+              <p>Description :<input type="text" name="descr" [(ngModel)]="my2user.seventhName" /></p>
+              <p>Date of Transaction: <input type="date" name="dot" [(ngModel)]="my2user.expence_dot" /></p>
+            </form>
+          </div>
+
+          <h2 style="margin-top: 2rem;">Expense Details:</h2>
+          <div>
+            <h4>Food:{{my2user.Food}}</h4>
+            <h4>Grocery:{{my2user.Grocery}}</h4>
+            <h4>Bills:{{my2user.Bills}}</h4>
+            <h4>Recharge:{{my2user.Recharges}}</h4>
+            <h4>Education:{{my2user.Education}}</h4>
+            <h4>Travel:{{my2user.Travel}}</h4>
+            <h4>Others:{{my2user.Others}}</h4>
+
+          </div>
+
+          <div style="margin-top: 2rem;">
+            <button style="margin-right: 1.1rem;" type="button" class="btn btn-primary mr-2" (click)="expensesubmit()">Submit</button>
+            <button style="margin-left: 1.1rem;" type="button" class="btn btn-danger btn-sm" (click)="loggingout()">LogOut</button>
+          </div>
+  
+
+        </div>
+        <div *ngIf="summaryFlag">
+          <div style="color: blueviolet;">
+            <h2>Welcome, {{curruser.firstName}}</h2>
+          </div>
+
+          <div style=" display: flex; justify-content: space-between;">
+            <button type="button" class="layer" (click)="profile()">Profile</button>
+            <button type="button" class="layer" (click)="income()">Income</button>
+            <button type="button" class="layer" (click)="expense()">Expense</button>
+            <button type="button" class="layer" (click)="summary()">Summary</button>
+            <button type="history" class="layer" (click)="history()">History</button>
+          </div>
+
+          <div style="margin-top: 2rem;">
+            Income Vs Expense
+          </div>
+          <div>
+            Total Income :{{curruser.totalIncome}}
+          </div>
+          <div>
+            Total Expense :{{curruser.totalExpense}}
+          </div>
+          <br />
+          <button type="button" class="btn btn-danger btn-sm" (click)="loggingout()">LogOut</button>
+        </div>
+        <div *ngIf="historyFlag">
+          <div style="color: blueviolet;">
+            <h2>Welcome, {{curruser.firstName}}</h2>
+          </div>
+
+          <div style=" display: flex; justify-content: space-between;">
+            <button type="button" class="layer" (click)="profile()">Profile</button>
+            <button type="button" class="layer" (click)="income()">Income</button>
+            <button type="button" class="layer" (click)="expense()">Expense</button>
+            <button type="button" class="layer" (click)="summary()">Summary</button>
+            <button type="history" class="layer" (click)="history()">History</button>
+          </div>
+
+          <div style="margin-top: 2rem;">
+
+            <app-history [message]="message"></app-history>
+
+          </div>
+
+
+          <button type="button" class="btn btn-danger btn-sm" (click)="loggingout()">LogOut</button>
+        </div>
+      </div>
+    </div>
+  </div>
