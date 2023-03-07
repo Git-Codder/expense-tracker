@@ -98,13 +98,13 @@
             <div style="display: flex; flex-direction: row; justify-content: space-around; margin-bottom: 2rem;">
 
               <div>
-                <label for="user_select">Select User 1: </label>
+                <label for="user_select">Select User: </label>
                 <select id="user_select" [(ngModel)]="userSelected_">
                   <option *ngFor="let user of users">{{ user.firstName }}</option>
                 </select>
               </div>
               <div>
-                <label for="date_select">Select User 2: </label>
+                <label for="date_select">Select Month: </label>
                 <select id="date_select" [(ngModel)]="dateSelected_">
                   <option *ngFor="let month of time_arr">{{ month }}</option>
                 </select>
